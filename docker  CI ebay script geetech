@@ -1,0 +1,45 @@
+pipeline{
+  agent any
+  tools{
+  maven "Maven 3.6.3"
+  }
+  stages{
+    stage('GitClone'){
+    steps{
+    sh "echo cloning the latest applications version"
+    git branch: 'stage', credentialsId: 'gitHubcredentilas', url: 'https://github.com/GEETECHNOLOGY/maven-web_application.git'
+    }
+    }
+    stage('TestBuild'){
+    steps{
+    sh "echo Running unitTesting"
+    sh "echo unitTesting ok. Creating packages"
+    sh "mvn clean package"
+    sh "echo Artifacts created"
+    }
+    }
+    stage('codeQuality'){
+    steps{
+    sh "echo Running codeQuality report"
+    sh "mvn sonar:sonar"
+    }
+    }
+    stage('uploadArtifacts'){
+    steps{
+    sh "echo uploadArtifacts into nexus"
+    sh "mvn deploy"
+    }
+    }
+    stage('message'){
+    steps{
+    sh "echo CI job successful"
+    }
+    }
+    stage('predeployment'){
+      steps{
+      sh "docker build -t geetec/maven-web-app ."
+      sh "docker push geetec/maven-web-app"
+      }
+      }
+  }
+}
