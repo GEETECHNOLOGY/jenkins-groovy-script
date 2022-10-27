@@ -1,0 +1,22 @@
+pipeline{
+  agent any
+  stages{
+  stage('unDeployment'){
+  steps{
+  sh "echo unDeploying existing application "
+  sh "docker rm -f webapp"
+  }
+  }
+  stage('deployment'){
+  steps{
+  sh "echo application is ready for deployment"
+  sh "docker run -d -p 8005:8080 --name webapp geetec/maven-web-app"
+  }
+  }
+  stage('emailNotification'){
+  steps{
+  sh "echo deployment successful"
+  }
+  }
+  }
+  }
